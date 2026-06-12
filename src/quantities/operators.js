@@ -140,6 +140,19 @@ function cleanTerms(num1, den1, num2, den2) {
 
   var combined = {};
 
+  function cleanTerms(num1, den1, num2, den2) {
+  function notUnity(val) {
+    return val !== UNITY;
+  }
+
+  num1 = num1.filter(notUnity);
+  num2 = num2.filter(notUnity);
+  den1 = den1.filter(notUnity);
+  den2 = den2.filter(notUnity);
+
+  // Use a prototype-less object to avoid key collisions
+  var combined = Object.create(null);
+
   function combineTerms(terms, direction) {
     var k;
     var prefix;
@@ -179,21 +192,21 @@ function cleanTerms(num1, den1, num2, den2) {
   var scale = 1;
 
   for (var prop in combined) {
-    if (combined.hasOwnProperty(prop)) {
-      var item = combined[prop];
-      var n;
-      if (item[0] > 0) {
-        for (n = 0; n < item[0]; n++) {
-          num.push(item[2] === null ? item[1] : [item[2], item[1]]);
-        }
+    var item = combined[prop];
+    var n;
+
+    if (item[0] > 0) {
+      for (n = 0; n < item[0]; n++) {
+        num.push(item[2] === null ? item[1] : [item[2], item[1]]);
       }
-      else if (item[0] < 0) {
-        for (n = 0; n < -item[0]; n++) {
-          den.push(item[2] === null ? item[1] : [item[2], item[1]]);
-        }
-      }
-      scale *= divSafe(item[3], item[4]);
     }
+    else if (item[0] < 0) {
+      for (n = 0; n < -item[0]; n++) {
+        den.push(item[2] === null ? item[1] : [item[2], item[1]]);
+      }
+    }
+
+    scale *= divSafe(item[3], item[4]);
   }
 
   if (num.length === 0) {
@@ -204,10 +217,10 @@ function cleanTerms(num1, den1, num2, den2) {
   }
 
   // Flatten
-  num = num.reduce(function(a,b) {
+  num = num.reduce(function(a, b) {
     return a.concat(b);
   }, []);
-  den = den.reduce(function(a,b) {
+  den = den.reduce(function(a, b) {
     return a.concat(b);
   }, []);
 
